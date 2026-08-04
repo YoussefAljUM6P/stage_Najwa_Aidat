@@ -1,0 +1,9 @@
+# gsplat ne compile pas avec torch >= 2.6 dans cette configuration (CUDA 12.4)
+torch<2.6
+torchvision
+torchaudio
+nerfstudio==1.1.5
+gsplat
+numpy<2
+pillow
+matplotlib
