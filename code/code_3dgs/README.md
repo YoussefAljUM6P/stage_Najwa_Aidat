@@ -116,7 +116,7 @@ automatiquement au démarrage : un entraînement interrompu reprend où il s'est
 PYTHON=$HOME/.conda/envs/<env>/bin/python
 export LD_LIBRARY_PATH=$HOME/.conda/envs/<env>/lib:$LD_LIBRARY_PATH
 
-cd <chemin>/icra2017-visual-navigation-1
+cd <chemin>/LE DOSSIER CONTENANT LES FICHIERS
 $PYTHON -u train.py
 ```
 
