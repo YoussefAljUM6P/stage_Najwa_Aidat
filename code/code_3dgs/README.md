@@ -95,6 +95,9 @@ python evaluate.py    # évaluation sur les cibles de TASK_LIST
 Le chemin du HDF5 est défini en tête de `train.py`, `evaluate.py` et
 `scene_loader.py` — à adapter avant tout lancement.
 
+Voici le lien pour le télécharger: 
+https://github.com/YoussefAljUM6P/stage_Najwa_Aidat/releases/download/v1.0/scene_3dgs.h5
+
 Les checkpoints sont écrits tous les 10 000 pas dans `CHECKPOINT_DIR`, et rechargés
 automatiquement au démarrage : un entraînement interrompu reprend où il s'est arrêté.
 
