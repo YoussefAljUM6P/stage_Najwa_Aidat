@@ -1,6 +1,6 @@
 # Asservissement visuel par apprentissage par renforcement (A3C / PPO)
 
-Ce dossier contient la version script de l'approche continue.
+Ce dossier contient la version continue de la navigation visuelle .
 Il regroupe une série d'expériences d'asservissement visuel dans une scène 3D
 reconstruite par **Gaussian Splatting** (scène *room* de Mip-NeRF 360) : un agent
 contrôle une caméra virtuelle (translation + rotation) et doit rejoindre une pose
@@ -18,8 +18,8 @@ RL-visual-servoing/
 ├── README.md
 ├── requirements.txt
 ├── donnees/
-│   ├── splat.ply                    modèle Gaussian Splatting de la scène « room »
-│   └── dataparser_transforms.json   transformation nerfstudio (repère COLMAP -> repère du splat)
+│   ├── dataparser_transforms.json   transformation nerfstudio (repère COLMAP -> repère du splat)
+│   └── splat.ply                    modèle Gaussian Splatting (à télécharger, voir « Données »)
 ├── config.py        chemins, intrinsèques caméra, lecture de la transformation nerfstudio
 ├── gs_scene.py      chargement du .ply, conversions de poses, rendu gsplat
 ├── envs.py          les 7 environnements Gymnasium
@@ -33,13 +33,35 @@ RL-visual-servoing/
 
 ## Données
 
-Le dossier `donnees/` contient les deux fichiers issus de l'entraînement
+Le dossier `donnees/` rassemble les deux fichiers issus de l'entraînement
 Gaussian Splatting (nerfstudio, méthode splatfacto) de la scène *room* :
 
 | Fichier | Contenu |
 |---|---|
 | `splat.ply` | Modèle Gaussian Splatting exporté (positions, échelles, rotations, opacités, harmoniques sphériques de degré 3) |
 | `dataparser_transforms.json` | Transformation (`transform`, matrice 3×4) et facteur d'échelle (`scale`) appliqués par nerfstudio aux poses COLMAP |
+
+`dataparser_transforms.json` est inclus dans le dépôt. `splat.ply` est trop
+volumineux pour être versionné : il est fourni sous forme d'archive dans la
+[release `donnees-v1`](https://github.com/YoussefAljUM6P/stage_Najwa_Aidat/releases/tag/donnees-v1)
+du dépôt. Télécharger `splat.zip`, puis le décompresser dans `donnees/` :
+
+```bash
+cd code/RL-visual-servoing/donnees
+curl -L -O https://github.com/YoussefAljUM6P/stage_Najwa_Aidat/releases/download/donnees-v1/splat.zip
+unzip splat.zip        # doit produire donnees/splat.ply
+```
+
+Pour vérifier que l'archive est complète et intacte, son empreinte SHA-256 doit être :
+
+```
+1a0e61a9a7f2bf08fe3c47968e0662098e7e07401e1fe866269612119f4a14fe
+```
+
+```bash
+sha256sum splat.zip        # Linux
+shasum -a 256 splat.zip    # macOS
+```
 
 `config.py` lit la transformation et l'échelle dans `dataparser_transforms.json`.
 Si le fichier est absent, il utilise les valeurs du notebook, écrites en dur.
@@ -110,6 +132,3 @@ les figures. Le rendu gsplat nécessite un GPU CUDA ; seule l'expérience `resne
 en a besoin pendant l'entraînement (pour `yaw` et `euler`, il sert uniquement à
 l'aperçu de la cible, désactivable avec `--no-preview`).
 
-## Remarque
-
-- Les figures sont sauvegardées en PNG (et affichées seulement avec `--show`).
