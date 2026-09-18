@@ -1,0 +1,11 @@
+# Environnement d'origine : notebook Kaggle, Python 3.12, GPU CUDA.
+# Versions non figées dans le notebook ; gsplat nécessite un GPU CUDA pour le rendu.
+numpy
+scipy
+matplotlib
+pillow
+torch
+torchvision
+gymnasium
+gsplat
+plyfile
