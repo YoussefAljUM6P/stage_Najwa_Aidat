@@ -1,14 +1,4 @@
-"""
-Configuration commune : chemins des données, intrinsèques caméra et
-paramètres de la transformation COLMAP -> nerfstudio (splatfacto).
 
-Sur Kaggle, les chemins d'origine étaient :
-    PLY_PATH          = /kaggle/input/datasets/awjantadia/mydataset1/splat1.ply
-    POSES_BOUNDS_PATH = /kaggle/input/datasets/thnhdg/testing/360_v2/room/poses_bounds.npy
-    IMAGES_DIR        = /kaggle/input/datasets/thnhdg/testing/360_v2/room/images
-    OUTPUT_DIR        = /kaggle/working
-Tous ces chemins peuvent être surchargés en ligne de commande (voir train.py).
-"""
 from pathlib import Path
 
 import numpy as np
@@ -17,8 +7,8 @@ import numpy as np
 # Chemins (relatifs au dossier du projet par défaut)
 # ---------------------------------------------------------------------------
 PLY_PATH = Path("data/splat1.ply")
-POSES_BOUNDS_PATH = Path("data/360_v2/room/poses_bounds.npy")
-IMAGES_DIR = Path("data/360_v2/room/images")
+POSES_BOUNDS_PATH = "YOUR PATH "
+IMAGES_DIR = "YOUR PATH "
 OUTPUT_DIR = Path("outputs")
 
 # ---------------------------------------------------------------------------
