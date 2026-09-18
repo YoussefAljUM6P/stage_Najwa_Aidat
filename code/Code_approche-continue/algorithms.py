@@ -1,9 +1,7 @@
 """
 Boucles d'entraînement A3C et PPO.
 
-Remarque : l'« A3C » du projet est une version synchrone à un seul worker
-(mise à jour acteur-critique avec avantage à la fin de chaque épisode), ce
-qui correspond en pratique à A2C. Il n'y a pas de workers asynchrones.
+
 
 Deux familles de boucles, qui reprennent les deux styles du notebook :
   * *_mlp      : une mise à jour par épisode, modèle ActorCriticMLP (envs 1 à 4)
