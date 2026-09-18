@@ -17,11 +17,7 @@ import matplotlib.pyplot as plt
 
 
 def evaluate_agent(model, env, num_episodes=50, device="cpu", deterministic=False):
-    """Erreur finale de position / rotation, taux de succès et longueur moyenne des épisodes.
-
-    deterministic=False reproduit le notebook (action échantillonnée par get_action).
-    deterministic=True utilise la moyenne de la politique, sans bruit.
-    """
+    
     model.eval()
     model.to(device)
     pos_errors, rot_errors, successes, lengths = [], [], [], []
@@ -70,8 +66,7 @@ def evaluate_agent(model, env, num_episodes=50, device="cpu", deterministic=Fals
 
 def evaluate_and_plot(env, model, device, target_pos=None, target_yaw=None, target_pitch=None,
                       target_roll=None, save_path=None, show=False):
-    """Un épisode avec l'action moyenne (sans bruit) ; trace la trajectoire 3D
-    de la caméra et l'évolution de la distance cosinus."""
+    
     model.eval()
     state, _ = env.reset(target_pos=target_pos, target_yaw=target_yaw,
                          target_pitch=target_pitch, target_roll=target_roll)
