@@ -9,7 +9,7 @@ Environnements Gymnasium d'asservissement visuel, dans l'ordre des expériences.
   6. QuaternionVisualServoingEnv   idem 5 mais dans l'espace de travail réel de la scène
   7. GSplatVisualServoingEnv       état = différence de features ResNet entre rendu courant et cible
 
-Dans le notebook, les environnements 1 et 2 s'appelaient tous deux
+Dans le code, les environnements 1 et 2 s'appelaient tous deux
 « VisualServoingEnvMLP » (la seconde définition remplaçait la première).
 
 Toutes les classes renvoient dans `info["mse"]` la distance à la cible
