@@ -1,0 +1,10 @@
+\newpage
+\section*{Abstract}
+
+Classical visual servoing requires a robust extraction and tracking of geometric features (points, lines, contours) to construct the interaction matrix linking camera motion to observed image variations. While effective, this approach relies heavily on the quality of feature extraction and is difficult to generalize to complex or real-world environments. Photometric visual servoing bypasses this method  by directly using pixel intensities as the control signal; however, it becomes sensitive to the dimensionality of the image space and to local minima in the cost function.
+
+
+This internship proposes combining photometric visual servoing—formulated within a low-dimensional latent space—with reinforcement learning (RL) for visual navigation. The goal is to leverage the generalization and sequential decision-making capabilities of RL to control an agent within a latent representation space derived from photometric information. The navigation environments used to train and evaluate the models are reconstructed using Gaussian Splatting (3DGS), a 3D reconstruction method that generates dense, continuous, photorealistic views of a scene from a set of images, thereby providing a rich, consistent photometric framework for learning visual servoing.
+
+\vspace{0.5cm}
+\textbf{Keywords:} photometric visual servoing, latent space, deep reinforcement learning, Gaussian Splatting, visual navigation.

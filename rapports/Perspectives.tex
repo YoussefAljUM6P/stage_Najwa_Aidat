@@ -1,0 +1,77 @@
+\section{Conclusion et perspectives}
+
+La finalité du stage était d'explorer la faisabilité d'une nouvelle approche de navigation visuelle, cette approche est basée sur l'apprentissage par renforcement dans une scène reconstruite par 3D Gaussian Splatting, et d'évaluer si cette approche pouvait constituer une alternative viable à l'asservissement visuel photométrique classique.
+
+Ce travail repose sur une hypothèse centrale: la fidélité visuelle du 3DGS permettrait de construire des scènes 3D dont la qualité visuelle est proche de la réalité ,et ainsi de réduire suffisamment le gap sim-to-real pour que les politiques apprises soient directement exploitables dans une scène réelle, à partir de simples photos capturées sous différents angles.
+
+Durant ce stage, le travail réalisé gravite autour de quatres étapes principales. La première étape consiste à faire la reconstruction 3D la scène \textit{room} du dataset Mip-NeRF 360 via un modèle Splatfacto, produisant une 
+reconstruction de haute qualité (PSNR = 31.49 dB) qui constitue le 
+socle visuel de l'ensemble du pipeline. La deuxième étape a porté sur 
+la reproduction et la validation du pipeline de navigation visuelle par 
+apprentissage par renforcement proposé par Zhu et al. \cite{ref10} sur 
+les 4 scènes AI2-THOR disponibles publiquement, obtenant des longueurs 
+moyennes de trajectoire comprises entre 7.81 et 21.60 pas, comparables 
+à la borne théorique du plus court chemin (17.6 pas) rapportée dans 
+l'article original. Ce pipeline a ensuite été adapté à la scène 3DGS 
+en construisant un graphe de navigation discret à partir des poses COLMAP, 
+avec correction de l'axe vertical réel via le vecteur \texttt{up\_world} 
+— l'agent A3C entraîné sur ce graphe atteignant un reward moyen de 9.92 
+et une longueur moyenne de trajectoire de 8.69 pas sur 5 cibles. Enfin, 
+la quatrième étape a étendu l'approche vers un espace d'actions continu, 
+où PPO s'est révélé nettement plus stable et plus efficace qu'A3C. la représentation par quaternions avec erreur relative a donné les meilleurs résultats, avec une distance finale stabilisée sous 0.02 m au-delà de l'épisode 2000.
+
+
+
+Ces résultats valident la faisabilité du pipeline proposé : il est 
+possible de capturer des photos d'une scène réelle, d'en construire 
+une représentation 3DGS photoréaliste, et d'y entraîner un agent de 
+navigation par apprentissage par renforcement capable d'atteindre des 
+poses cibles avec une précision sous-centimétrique.
+
+
+
+Ces travaux constituent une première 
+validation de faisabilité de l'approche. Plusieurs directions de recherche se dégagent naturellement pour la suite :
+
+\paragraph{Comparaison avec l'asservissement visuel photométrique.}
+L'objectif à terme est de comparer quantitativement le pipeline proposé 
+avec l'asservissement visuel photométrique classique, sur les mêmes 
+scènes et les mêmes cibles. Cette comparaison porterait sur plusieurs 
+critères : la précision de convergence, le temps de calcul, la 
+robustesse aux changements d'illumination, et le coût de mise en 
+œuvre. D'un point de vue coût, l'approche 3DGS + RL nécessite une 
+phase d'entraînement offline (reconstruction 3DGS + entraînement de 
+l'agent), mais offre ensuite un temps d'inférence très faible, 
+contrairement à l'asservissement photométrique qui nécessite le calcul 
+de la matrice d'interaction à chaque pas de temps.
+
+\paragraph{Transfert sim-to-real.}
+La prochaine étape naturelle est de valider le transfert de la politique 
+apprise dans la scène 3DGS vers un robot réel naviguant dans la scène 
+physique correspondante. La fidélité visuelle du 3DGS laisse espérer 
+un gap sim-to-real faible, mais des expériences sur robot réel restent 
+nécessaires pour le confirmer.
+
+\paragraph{Généralisation à d'autres scènes.}
+Le pipeline a été testé sur une seule scène (\textit{room}). Une 
+évaluation sur plusieurs scènes de natures différentes (extérieur, 
+scène industrielle, environnement dynamique) permettrait de mesurer 
+la généralité de l'approche et d'identifier ses limites.
+
+\paragraph{Amélioration de la représentation de l'orientation.}
+La représentation par quaternions a donné les meilleurs résultats, 
+mais la convergence reste sensible aux hyperparamètres. L'exploration 
+de représentations alternatives — 6D rotation representation, 
+SO(3) flow matching — pourrait améliorer la stabilité et la vitesse 
+de convergence de l'agent sur la composante orientation.
+
+\paragraph{Intégration de l'asservissement photométrique en espace 
+latent.}
+Une direction prometteuse consiste à combiner les deux approches : 
+utiliser les caractéristiques visuelles extraites par le 3DGS comme 
+signal de récompense pour l'agent RL, réalisant ainsi un asservissement 
+photométrique implicite dans l'espace latent. Cette formulation 
+unifierait les deux paradigmes et pourrait bénéficier des avantages 
+de chacun.
+
+

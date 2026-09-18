@@ -1,0 +1,876 @@
+\section{État d'art}
+
+\begin{quote}
+\itshape
+« L'apprentissage automatique/statistique, c'est la capacité d'un ordinateur à apprendre sans avoir été explicitement programmé.»
+\begin{flushright}
+— Arthur Samuel, 1959
+\end{flushright}
+\end{quote}
+
+L'apprentissage automatique (machine learning) est l’ensemble des méthodes permettant à un système d'apprendre à partir de données, via des modèles mathématiques. Parmi ces méthodes, l'apprentissage profond (deep learning) s'appuie sur des réseaux de neurones à plusieurs couches pour extraire automatiquement des représentations de plus en plus abstraites à partir de données brutes, telles que des images ou des séquences temporelles.
+
+
+L'apprentissage par renforcement (reinforcement learning, RL), quant à lui, se distingue des paradigmes supervisé et non supervisé : un agent apprend à prendre des décisions séquentielles par interaction avec un environnement, en maximisant une récompense cumulative, plutôt qu'à partir d'exemples étiquetés.
+
+ Ces méthodes d'apprentissage ne sont pas récentes — leurs fondements remontent à plusieurs décennies (Figure~\ref{fig:img2})
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/evolution-ai.png}
+    \caption{Évolution de la popularité des termes \textit{machine learning}, \textit{deep learning}, \textit{artificial intelligence} et \textit{data science} depuis 1950, obtenue via Google Books Ngram Viewer (source : support de cours, D. Mateus, Centrale Nantes).}
+    \label{fig:img2}
+\end{figure}
+
+\subsection{Reinforcement learning}
+
+L'apprentissage par renforcement (RL), et plus particulièrement l'apprentissage par renforcement profond (deep RL) — combinaison de l'apprentissage profond et de l'apprentissage par renforcement \cite{ref2} — ont vu leurs champs d'application se diversifier considérablement au fil du temps, permettant de résoudre des problématiques complexes dans des domaines aussi variés que la santé, la surveillance, la robotique ou encore la finance.
+
+
+Le RL repose sur quatre éléments fondamentaux définissant le cadre 
+d'interaction entre un système qui apprend et son environnement :
+\begin{itemize}[noitemsep, topsep=4pt]
+    \item \textbf{L'agent} : l'exécuteur ou l'entité qui prend les décisions et apprend au fil des interactions avec son environnement. Il observe l'état courant de l'environnement et 
+    choisit une action à effectuer selon sa politique $\pi$.
+    \item \textbf{L'environnement} : le système avec lequel l'agent interagit. À chaque pas de temps $t$, il reçoit l'action de l'agent, fait évoluer son état et renvoie un nouvel état $s_{t+1}$.
+    \item \textbf{L'action} $a_t$ : la décision prise par l'agent à l'instant 
+    $t$, choisie dans un espace d'actions $\mathcal{A}$ qui peut être discret 
+    (ex. : navigation) ou continu (ex. : contrôle moteur).
+    \item \textbf{La récompense} $r_t$ : un signal scalaire renvoyé par 
+    l'environnement après chaque action, indiquant la qualité de la décision 
+    prise. L'objectif de l'agent est de maximiser la somme des récompenses 
+    cumulées $R_t = \sum_{k=0}^{\infty} \gamma^k r_{t+k}$, où $\gamma \in 
+    (0,1]$ est le facteur d'actualisation.
+\end{itemize}
+
+\vspace{0.5cm}
+
+
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    node distance=2cm,
+    box/.style={rectangle, rounded corners, draw, fill=#1, 
+                minimum width=3cm, minimum height=1cm, align=center, font=\small},
+    arrow/.style={-{Stealth}, thick},
+]
+
+%--- Noeuds principaux ---
+\node[box=violet!30] (agent) {Agent};
+\node[box=teal!30, right=5cm of agent] (env) {Environnement};
+
+%--- Flèches du cycle ---
+% Action : agent -> environnement (en haut)
+\draw[arrow, blue!70, thick] 
+    (agent.north) -- ++(0, 0.8) -- node[above, font=\small] 
+    {Action $a_t$} ++(5,0) -- (env.north);
+
+% État : environnement -> agent (en bas)
+\draw[arrow, pink!80!red, thick] 
+    (env.south) -- ++(0, -0.8) -- node[below, font=\small] 
+    {État $s_{t+1}$} ++(-2.5, 0) -- ++(0,0);
+
+% Récompense : environnement -> agent (en bas, décalé)
+\draw[arrow, orange!80, thick]
+    (env.south) -- ++(0, -1.5) -- node[below, font=\small]
+    {Récompense $r_t$} ++(-5, 0) -- (agent.south);
+
+%--- Annotation temporelle ---
+\node[font=\footnotesize, gray, below=2.5cm of agent] 
+    {$t \rightarrow t+1 \rightarrow t+2 \rightarrow \cdots$};
+
+%--- Objectif ---
+\node[font=\footnotesize, gray, below=2.5cm of env, align=center] 
+    {Maximiser $R_t = \displaystyle\sum_{k=0}^{\infty} \gamma^k r_{t+k}$};
+
+\end{tikzpicture}
+\caption{Boucle d'interaction cyclique agent-environnement en apprentissage 
+par renforcement.}
+\label{fig:rl_cycle}
+\end{figure}
+
+Ces quatre éléments interagissent de manière cyclique : l'agent observe 
+l'état $s_t$, choisit une action $a_t$, reçoit une récompense $r_t$ et 
+un nouvel état $s_{t+1}$, puis met à jour sa politique en conséquence. 
+C'est cette boucle d'interaction, répétée sur de nombreux épisodes, qui 
+permet à l'agent d'apprendre un comportement optimal.
+
+\vspace{0.3cm}
+
+Plusieurs familles d'algorithmes ont été proposées dans la littérature \cite{ref2}:
+\begin{itemize}
+    \item les méthodes \textit{value-based}, qui apprennent une fonction de 
+    valeur pour dériver une politique implicite ;
+    \item les méthodes \textit{policy gradient}, qui optimisent directement 
+    la politique ;
+    \item les méthodes \textit{model-based}, qui s'appuient sur un modèle 
+    explicite de l'environnement.
+\end{itemize}
+
+Le tableau~\ref{tab:rl_algos} présente une comparaison 
+de ces algorithmes selon leur espace d'actions, leur type de politique, 
+leur stabilité et leur efficacité d'échantillonnage.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\renewcommand{\arraystretch}{1.4}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{|>{\centering\arraybackslash}m{2.5cm}|m{2.5cm}|m{3cm}|m{4.5cm}|m{2cm}|}
+\hline
+\rowcolor{gray!20}
+\textbf{Famille} &
+\textbf{Algorithme} &
+\textbf{Espace d'actions} &
+\textbf{Stabilité / Biais} &
+\textbf{Efficacité d'échantillonnage} \\
+\hline
+\multirow{7}{*}{\centering\small Value-based}
+& Q-learning & Discret & Convergence garantie (cas tabulaire) & Faible \\ \cline{2-5}
+& Fitted Q / NFQ & Discret & Risque d'instabilité & Moyenne \\ \cline{2-5}
+& DQN & Discret & Stabilisé par target network & Bonne \\ \cline{2-5}
+& Double DQN & Discret & Corrige le biais de surestimation de DQN & Bonne \\ \cline{2-5}
+& Dueling DQN & Discret & Architecture améliorée & Bonne \\ \cline{2-5}
+& Distributional DQN & Discret & Signal d'apprentissage plus riche & Meilleure que DQN \\ \cline{2-5}
+& Rainbow & Discret & État de l'art sur Atari & Très bonne \\
+\hline
+\multirow{7}{*}{\centering\small Policy gradient}
+& REINFORCE & Discret/Continu & Forte variance (Monte-Carlo) & Faible \\ \cline{2-5}
+& DDPG & Continu & Nécessite un critique (actor-critic) & Bonne \\ \cline{2-5}
+& \cellcolor{blue!15}\textbf{A3C} & \cellcolor{blue!15}\textbf{Discret/Continu} & \cellcolor{blue!15}\textbf{Stabilisé par rollouts asynchrones} & \cellcolor{blue!15}\textbf{Moyenne} \\ \cline{2-5}
+& Natural PG & Discret/Continu & Meilleure direction de descente & Coûteuse \\ \cline{2-5}
+& TRPO & Discret/Continu & Très stable (contrainte KL) & Coûteuse \\ \cline{2-5}
+& \cellcolor{blue!15}\textbf{PPO} & \cellcolor{blue!15}\textbf{Discret/Continu} & \cellcolor{blue!15}\textbf{Stable, plus simple que TRPO} & \cellcolor{blue!15}\textbf{Bonne, simple à régler} \\ \cline{2-5}
+& Q-Prop & Continu & Réduit la variance via un control variate & Meilleure que Monte-Carlo \\
+\hline
+\multirow{4}{*}{\centering\small Model-based}
+& MCTS & Discret & Dépend d'un modèle connu & Très bonne si modèle exact \\ \cline{2-5}
+& PILCO & Continu & Bonne prise en compte de l'incertitude & Excellente \\ \cline{2-5}
+& VIN / Predictron & Discret & Bonne généralisation structurelle & Bonne \\ \cline{2-5}
+& CRAR & Discret/Continu & Bon compromis, interprétable & Bonne \\
+\hline
+\end{tabular}
+\caption{Comparaison des principaux algorithmes de RL selon leur famille,
+leur stabilité et leur efficacité d'échantillonnage.}
+\label{tab:rl_algos}
+\end{table}
+
+
+Parmi ces algorithmes, deux se distinguent particulièrement dans le contexte de la navigation visuelle : l'\textbf{A3C} (\textit{Asynchronous Advantage Actor-Critic}) et le \textbf{PPO} (\textit{Proximal Policy Optimization}), tous deux de la famille \textit{policy gradient} et adaptés aux espaces d'actions discrets et continus.
+
+
+
+\subsubsection{Asynchronous Advantage Actor-Critic (A3C)}
+
+L'algorithme A3C (\textit{Asynchronous Advantage Actor-Critic}), proposé par Mnih et al. \cite{ref3}, est une avancée majeure dans le domaine du deep RL. Il repose sur un cadre asynchrone 
+permettant d'entraîner des réseaux de neurones profonds de manière plus stable et plus efficace, sans recourir à la mémoire de rejeu (\textit{experience replay}) utilisée par des méthodes antérieures telles que DQN.
+
+\vspace{0.5cm}
+
+Les approches classiques de deep RL, notamment DQN, assurent la stabilité de l'apprentissage en stockant les transitions passées dans une mémoire et en échantillonnant aléatoirement des mini-batches afin de briser les  corrélations temporelles entre les observations. Cette solution est efficace, mais présente plusieurs limitations : une consommation mémoire 
+importante(à cause du stockage des transitions passées), une restriction aux algorithmes off-policy et une dépendance à 
+des ressources matérielles spécialisées (GPU). A3C propose une alternative conceptuellement simple : au lieu de stocker des expériences passées, plusieurs agents s'exécutent en parallèle et de façon asynchrone sur des instances indépendantes de l'environnement, ce qui décolle naturellement les données et 
+stabilise l'apprentissage.
+
+\subsubsection*{Architecture}
+
+L'architecture d'A3C repose sur deux composantes principales, inspirées du 
+paradigme \textit{actor-critic} :
+
+\begin{itemize}[noitemsep, topsep=4pt]
+    \item \textbf{L'acteur} (\textit{actor}) : un réseau de neurones 
+    paramétré par $\theta$ qui représente la politique stochastique 
+    $\pi(a_t | s_t ; \theta)$, c'est-à-dire la distribution de probabilité 
+    sur les actions à prendre depuis un état donné.
+    \item \textbf{Le critique} (\textit{critic}) : un réseau paramétré par 
+    $\theta_v$ qui estime la fonction de valeur $V(s_t ; \theta_v)$, 
+    c'est-à-dire le retour espéré depuis l'état $s_t$.
+\end{itemize}
+
+
+\subsubsection*{Principe }
+
+Le cœur d'A3C repose sur l'exécution asynchrone de plusieurs fils d'exécution (\textit{threads}) sur un seul processeur multi-cœur. Chaque thread maintient une copie locale des paramètres du réseau\cite{ref3}, interagit avec sa propre instance de l'environnement, accumule des gradients sur plusieurs pas de temps, puis met à jour de façon asynchrone les paramètres globaux partagés. Ce mécanisme est illustré dans la Figure~\ref{fig:a3c_architecture}.
+
+\begin{figure}[H]
+\centering
+\scalebox{0.55}{
+\begin{tikzpicture}[
+    node distance=1.2cm and 1.8cm,
+    every node/.style={font=\small},
+    box/.style={rectangle, rounded corners, draw, fill=#1, minimum width=2.5cm, 
+                minimum height=0.8cm, align=center},
+    arrow/.style={-{Stealth}, thick},
+    darrow/.style={{Stealth}-{Stealth}, thick, dashed}
+]
+
+%--- Réseau global ---
+\node[box=blue!20, minimum width=8cm] (global) 
+    {\textbf{Réseau global partagé} \\ $\theta$ (politique) \quad $\theta_v$ (valeur)};
+
+%--- Threads ---
+\node[box=green!20, below left=1.5cm and 3cm of global] (t1) 
+    {Thread 1 \\ copie locale $\theta'$};
+\node[box=green!20, below=1.5cm of global] (t2) 
+    {Thread 2 \\ copie locale $\theta'$};
+\node[box=green!20, below right=1.5cm and 3cm of global] (tN) 
+    {Thread $N$ \\ copie locale $\theta'$};
+
+%--- Environnements ---
+\node[box=orange!20, below=1.0cm of t1] (env1) {Environnement 1 \\ $s_t, a_t, r_t$};
+\node[box=orange!20, below=1.0cm of t2] (env2) {Environnement 2 \\ $s_t, a_t, r_t$};
+\node[box=orange!20, below=1.0cm of tN] (envN) {Environnement $N$ \\ $s_t, a_t, r_t$};
+
+%--- Flèches threads <-> réseau global ---
+\draw[darrow, color=blue!60] (global.south west) -- (t1.north) 
+    node[midway, left, font=\tiny] {sync $\theta$};
+\draw[darrow, color=blue!60] (global.south) -- (t2.north) 
+    node[midway, right, font=\tiny] {sync $\theta$};
+\draw[darrow, color=blue!60] (global.south east) -- (tN.north) 
+    node[midway, right, font=\tiny] {sync $\theta$};
+
+%--- Flèches threads <-> environnements ---
+\draw[arrow] (t1) -- (env1) node[midway, right, font=\tiny] {$a_t$};
+\draw[arrow] (env1.north) -- ++(0,0.3) -| (t1.south) 
+    node[near start, below, font=\tiny] {$s_{t+1}, r_t$};
+
+\draw[arrow] (t2) -- (env2) node[midway, right, font=\tiny] {$a_t$};
+\draw[arrow] (env2.north) -- ++(0,0.3) -| (t2.south) 
+    node[near start, below, font=\tiny] {$s_{t+1}, r_t$};
+
+\draw[arrow] (tN) -- (envN) node[midway, right, font=\tiny] {$a_t$};
+\draw[arrow] (envN.north) -- ++(0,0.3) -| (tN.south) 
+    node[near start, below, font=\tiny] {$s_{t+1}, r_t$};
+
+%--- Points de suspension ---
+%--- Points de suspension ---
+\node[font=\large] at ($(t2)!0.5!(tN)$) {$\cdots$};
+\node[font=\large] at ($(env2)!0.5!(envN)$) {$\cdots$};
+
+%--- Légende gradient ---
+\node[below=0.5cm of env2, font=\tiny, align=center, text=blue!60] 
+    {$\longleftrightarrow$ : synchronisation des paramètres et gradients};
+
+%--- Séparateur horizontal ---
+\draw[dashed, gray] (-5, -6.5) -- (7, -6.5);
+
+%--- Réseau interne (actor-critic) en bas ---
+\begin{scope}[yshift=-8cm]
+    \node[font=\small\bfseries] at (0, 1) {Architecture interne (par thread)};
+    
+    \node[box=gray!15, minimum width=3cm] (state) at (0,0) {État $s_t$};
+    \node[box=gray!30, minimum width=3cm, below=0.8cm of state] (cnn) 
+        {Réseau partagé \\ (CNN / FC)};
+    \node[box=red!20, minimum width=2cm, below left=1cm and 0.8cm of cnn] (actor) 
+        {Acteur $\pi(a|s;\theta)$ \\ \textit{softmax}};
+    \node[box=purple!20, minimum width=2cm, below right=1cm and 0.8cm of cnn] (critic) 
+        {Critique $V(s;\theta_v)$ \\ \textit{linéaire}};
+    \node[box=yellow!30, minimum width=2cm, below=1cm of actor] (action) 
+        {Action $a_t$};
+    \node[box=yellow!30, minimum width=2cm, below=1cm of critic] (advantage) 
+        {Avantage $A(s_t,a_t)$};
+
+    \draw[arrow] (state) -- (cnn);
+    \draw[arrow] (cnn) -- (actor);
+    \draw[arrow] (cnn) -- (critic);
+    \draw[arrow] (actor) -- (action);
+    \draw[arrow] (critic) -- (advantage);
+\end{scope}
+\end{tikzpicture}
+}
+\caption{Architecture d'A3C : exécution asynchrone de $N$ threads avec 
+un réseau global partagé  et architecture interne actor-critic 
+de chaque thread  \cite{ref3}.}
+\label{fig:a3c_architecture}
+\end{figure}
+
+
+
+\subsubsection*{Fonction d'avantage et mise à jour}
+
+La mise à jour de la politique dans A3C utilise une estimation de la 
+\textbf{fonction d'avantage} $A(s_t, a_t)$, définie comme la différence entre 
+le retour obtenu et la valeur estimée de l'état :
+
+\begin{equation}
+    A(s_t, a_t ; \theta, \theta_v) = \sum_{i=0}^{k-1} \gamma^i r_{t+i} + 
+    \gamma^k V(s_{t+k} ; \theta_v) - V(s_t ; \theta_v)
+    \label{eq:advantage}
+\end{equation}
+
+où $k$ est le nombre de pas de temps accumulés (borné par $t_{\max}$) et 
+$\gamma \in (0,1]$ est le facteur d'actualisation. Cette estimation à $n$ pas 
+(\textit{n-step return}) permet de propager les récompenses plus rapidement 
+qu'une mise à jour en un seul pas, tout en réduisant la variance par rapport 
+à un retour Monte-Carlo complet.
+
+Le gradient de la politique s'écrit alors :
+
+\begin{equation}
+    \nabla_{\theta'} \log \pi(a_t | s_t ; \theta') \cdot A(s_t, a_t ; 
+    \theta, \theta_v)
+    \label{eq:policy_gradient}
+\end{equation}
+
+\subsubsection*{Régularisation par entropie}
+
+Pour encourager l'exploration et éviter une convergence prématurée vers des 
+politiques déterministes sous-optimales, A3C ajoute un terme de régularisation 
+par entropie à la fonction objectif. Le gradient complet devient :
+
+\begin{equation}
+    \nabla_{\theta'} \log \pi(a_t | s_t ; \theta')(R_t - V(s_t ; \theta_v)) 
+    + \beta \nabla_{\theta'} H(\pi(s_t ; \theta'))
+    \label{eq:entropy}
+\end{equation}
+
+où $H$ est l'entropie de la politique et $\beta$ est un hyperparamètre 
+contrôlant l'intensité de la régularisation. Un $\beta$ plus grand favorise 
+l'exploration, tandis qu'un $\beta$ trop faible risque de conduire à une 
+politique trop déterministe.
+
+\subsubsection*{Résultats et avantages}
+
+A3C surpasse l'état de l'art sur 57 jeux Atari en deux fois moins de temps 
+d'entraînement que DQN, en utilisant uniquement 16 cœurs CPU sans GPU. 
+Ses principaux avantages par rapport aux méthodes précédentes sont :
+
+\begin{itemize}[noitemsep, topsep=4pt]
+    \item \textbf{Efficacité matérielle} : entraînement sur CPU standard, 
+    sans nécessité de GPU.
+    \item \textbf{Stabilité} : la diversité des expériences entre threads 
+    remplace avantageusement la mémoire de rejeu.
+    \item \textbf{Généralité} : applicable aux espaces d'actions discrets et 
+    continus, ainsi qu'aux agents feedforward et récurrents (LSTM).
+\end{itemize}
+
+\subsubsection{Proximal Policy Optimization (PPO)}
+
+
+
+Le PPO (\textit{Proximal Policy Optimization}), proposé par Schulman et al. \cite{ref4} est une méthode de \textit{policy gradient} conçue 
+pour mêler la simplicité  des méthodes classiques avec la stabilité et l'efficacité de TRPO (\textit{Trust Region Policy Optimization}). Il constitue aujourd'hui l'un des algorithmes les plus couramment utilisés pour l'entraînement d'agents dans les jeux vidéo, l'automatisation des processus robotisés et les voitures autonomes.
+
+\vspace{0.5cm}
+
+Les méthodes de \textit{policy gradient} classiques, telles que REINFORCE, souffrent d'une instabilité due à des mises à jour trop importantes de la politique (une seule grande mise à jour peut dégrader significativement les performances et rendre l'apprentissage difficile à récupérer). TRPO résout ce problème en contraignant la divergence DKL entre l'ancienne et la nouvelle politique: 
+
+\begin{equation}
+    D_{\text{KL}}\big(\pi_{\theta_{\text{old}}}(\cdot | s_t) \,\|\, 
+    \pi_\theta(\cdot | s_t)\big) = \int_{-\infty}^{+\infty} 
+    \pi_{\theta_{\text{old}}}(a|s) \ln 
+    \frac{\pi_{\theta_{\text{old}}}(a|s)}{\pi_\theta(a|s)} \, da < \delta
+    \label{eq:kl_trpo}
+\end{equation}
+
+Mais cette solution est au prix d'une implémentation mathématiquement complexe et incompatible avec le partage de paramètres et les architectures modernes. PPO propose une alternative simple et efficace : une \textbf{fonction objectif écrêtée} (\textit{clipped surrogate objective}) qui limite naturellement l'amplitude des mises à jour sans contrainte explicite.
+
+\subsubsection*{Fonction objectif écrêtée}
+
+L'idée centrale de PPO repose sur le ratio de probabilité entre la nouvelle 
+politique $\pi_\theta$ et l'ancienne politique $\pi_{\theta_{\text{old}}}$ :
+
+\begin{equation}
+    r_t(\theta) = \frac{\pi_\theta(a_t | s_t)}{\pi_{\theta_{\text{old}}}(a_t | s_t)}
+    \label{eq:ppo_ratio}
+\end{equation}
+
+Ce ratio vaut 1 lorsque la politique n'a pas changé. PPO maximise la fonction 
+objectif suivante :
+
+\begin{equation}
+    L^{\text{CLIP}}(\theta) = \hat{\mathbb{E}}_t \left[ 
+    \min\left( r_t(\theta)\hat{A}_t,\ 
+    \text{clip}(r_t(\theta),\ 1-\varepsilon,\ 1+\varepsilon)\hat{A}_t \right) 
+    \right]
+    \label{eq:ppo_clip}
+\end{equation}
+
+où $\varepsilon$ est un hyperparamètre (typiquement $\varepsilon = 0.2$) et 
+$\hat{A}_t$ est une estimation de la fonction d'avantage. Le mécanisme 
+d'écrêtage fonctionne comme suit :
+\begin{itemize}[noitemsep, topsep=4pt]
+    \item Si $\hat{A}_t > 0$ (bonne action) : le ratio est écrêté à 
+    $1 + \varepsilon$, ce qui empêche de trop augmenter la probabilité de 
+    cette action.
+    \item Si $\hat{A}_t < 0$ (mauvaise action) : le ratio est écrêté à 
+    $1 - \varepsilon$, ce qui empêche de trop diminuer sa probabilité.
+\end{itemize}
+
+En prenant le minimum entre l'objectif écrêté et non écrêté, PPO obtient une 
+borne inférieure pessimiste de la performance, garantissant que la mise à jour 
+ne peut pas être trop agressive.
+
+\subsubsection*{Fonction objectif complète}
+
+En pratique, PPO utilise une architecture qui partage les paramètres entre 
+l'acteur et le critique, et combine trois termes dans sa fonction objectif 
+globale :
+
+\begin{equation}
+    L(\theta) = \hat{\mathbb{E}}_t \left[ 
+    L^{\text{CLIP}}_t(\theta) - c_1 L^{\text{VF}}_t(\theta) 
+    + c_2 S[\pi_\theta](s_t) \right]
+    \label{eq:ppo_full}
+\end{equation}
+
+où :
+\begin{itemize}[noitemsep, topsep=4pt]
+    \item $L^{\text{CLIP}}_t(\theta)$ : la fonction objectif écrêtée de la 
+    politique
+    \item $L^{\text{VF}}_t(\theta) = (V_\theta(s_t) - V_t^{\text{cible}})^2$ 
+    : l'erreur quadratique de la fonction de valeur
+    \item $S[\pi_\theta](s_t)$ : un bonus d'entropie pour encourager 
+    l'exploration
+    \item $c_1, c_2$ : des coefficients de pondération
+\end{itemize}
+
+\subsubsection*{Algorithme}
+
+PPO s'exécute de façon itérative avec $N$ acteurs parallèles, chacun 
+collectant $T$ pas de temps de données, puis optimise la fonction objectif 
+sur $K$ époques avec des mini-batches :
+
+\begin{enumerate}[noitemsep, topsep=4pt]
+    \item Chaque acteur exécute la politique courante $\pi_{\theta_{\text{old}}}$ 
+    pendant $T$ pas de temps et calcule les estimations d'avantage 
+    $\hat{A}_1, \ldots, \hat{A}_T$.
+    \item La fonction objectif $L^{\text{CLIP}}$ est optimisée sur les $NT$ 
+    transitions collectées, avec $K$ époques de descente de gradient 
+    stochastique (Adam).
+    \item Les paramètres sont mis à jour : $\theta_{\text{old}} \leftarrow \theta$.
+\end{enumerate}
+
+
+
+
+
+\subsection{3D Gaussian Splatting}
+
+Le \textit{3D Gaussian Splatting} (3DGS),premièrement introduit par Kerbl et al. \cite{ref5}, est une méthode qui permet de faire une représentation et un rendu des scènes 3D en temps réel. Elle se distingue des approches implicites comme les NeRF (\textit{Neural Radiance Fields}) par une représentation \textbf{explicite} de la scène sous forme de primitives gaussiennes 3D, permettant un rendu haute qualité à des vitesses interactives et en temps réel .
+
+
+\vspace{0.5cm}
+
+Les méthodes de synthèse de nouvelles vues (\textit{novel view synthesis}) consistent à reconstruire une scène 3D à partir d'un ensemble d'images 2D en générant de nouveaux points de vue de manière réaliste. Les NeRF ont largement évolué dans ce domaine, mais souffrent de temps d'entraînement et de rendu élevés dus à leur nature implicite (interroger le réseau de neurones une centaine de fois pour chaque pixel). Le 3DGS répond à ces limitations en proposant une représentation qui est à la fois explicite et différentiable, optimisée directement depuis des points 3D issus d'une reconstruction par Structure-from-Motion (SfM), typiquement avec COLMAP.
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\linewidth]{images/SFM-Colmap.png}
+    \caption{Principe du Structure-from-Motion (SfM)  \\ 
+    \small\textit{Source : Theia-sfm.org (2016)}}
+    \label{fig:sfm}
+\end{figure}
+\subsubsection{Représentation par gaussiennes 3D}
+
+Une scène 3D est représentée par un ensemble de gaussiennes 3D, chacune de ces gaussienne est définie par :
+
+\begin{itemize}[noitemsep, topsep=4pt]
+    \item  $\boldsymbol{\mu} \in \mathbb{R}^3$ : la position de la gaussienne, c'est son centre dans l'espace 3D.
+    \item  $\boldsymbol{\Sigma} \in 
+    \mathbb{R}^{3\times3}$ : sa Matrice de covariance , qui contrôle la forme et l'orientation de la gaussienne. Pour garantir la semi-définie positivité, elle est paramétrée par une matrice d'échelle $\mathbf{S}$ et un quaternion de rotation $\mathbf{R}$ :
+    \begin{equation}
+        \boldsymbol{\Sigma} = \mathbf{R}\mathbf{S}\mathbf{S}^\top\mathbf{R}^\top
+        \label{eq:covariance}
+    \end{equation}
+    \item  $\alpha \in [0,1]$ :son opacité, permettant de contrôler la transparence .
+    \item \textbf{Couleur} : représentée par des harmoniques sphériques 
+    (\textit{Spherical Harmonics}, SH) pour modéliser les effets 
+    dépendants du point de vue.
+\end{itemize}
+
+La fonction gaussienne 3D s'écrit :
+
+\begin{equation}
+    G(\mathbf{x}) = e^{-\frac{1}{2}(\mathbf{x} - \boldsymbol{\mu})^\top 
+    \boldsymbol{\Sigma}^{-1} (\mathbf{x} - \boldsymbol{\mu})}
+    \label{eq:gaussian3d}
+\end{equation}
+
+\subsubsection{Projection et rendu parsplatting}
+
+Afin de créer une image depuis un point de vue donné, chacune des gaussienne 3D est projetée dans le plan image et transformée en une gaussienne 2D . Étant donné la matrice de transformation de la caméra $\mathbf{W}$ et la matrice jacobienne de l'approximation affine de la projection $\mathbf{J}$, la covariance 2D projetée est exprimée par  :
+
+\begin{equation}
+    \boldsymbol{\Sigma}' = \mathbf{J}\mathbf{W}\boldsymbol{\Sigma}
+    \mathbf{W}^\top\mathbf{J}^\top
+    \label{eq:proj_cov}
+\end{equation}
+
+Le rendu final de chaque pixel est obtenu par un \textit{alpha-blending} 
+ordonné des gaussiennes triées par profondeur :
+
+\begin{equation}
+    \mathbf{C} = \sum_{i=1}^{N} \mathbf{c}_i \alpha_i 
+    \prod_{j=1}^{i-1}(1 - \alpha_j)
+    \label{eq:alpha_blending}
+\end{equation}
+
+où $\mathbf{c}_i$ est la couleur et $\alpha_i$ l'opacité de la $i$-ème 
+gaussienne. Ce processus est entièrement différentiable et implémenté sur 
+GPU via un rastériseur CUDA optimisé, ce qui permet d'atteindre des vitesses 
+de rendu de l'ordre de \textbf{100 FPS} à résolution Full HD.
+
+\subsubsection{Optimisation et densification adaptative}
+
+Le 3DGS est une représentation  différentiable; l'optimisation de ses  gaussiennes se fait par descente de gradient (Adam) en minimisant une fonction de perte combinant la norme  L1 et la mesure de la similarité perceptuelle SSIM  entre l'image rendue et l'image réelle :
+
+
+
+\begin{equation}
+    \mathcal{L} = (1 - \lambda)\mathcal{L}_1 + \lambda \mathcal{L}_{\text{SSIM}}
+    \label{eq:loss_3dgs}
+\end{equation}
+
+\vspace{2cm}
+Un mécanisme de \textbf{densification adaptative} permet d'ajuster 
+automatiquement le nombre de gaussiennes au cours de l'optimisation :
+\begin{itemize}[noitemsep, topsep=4pt]
+    \item \textbf{Clonage} : si une région de la scène est sous-représentée 
+    (petites gaussiennes avec un gradient de position élevé), une nouvelle 
+    gaussienne est ajoutée.
+    \item \textbf{Scission} : si une gaussienne est trop grande par rapport 
+    à la géométrie locale, elle est divisée en deux plus petites.
+    \item \textbf{Élagage} : les gaussiennes avec une opacité trop faible 
+    sont supprimées périodiquement.
+\end{itemize}
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\linewidth]{images/dens-adap.png}
+    \caption{Densification adaptative des gaussiennes 3D \cite{ref5}}
+    \label{fig:dens}
+\end{figure}
+
+
+
+\subsubsection*{Avantages par rapport aux NeRF}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|m{3.5cm}|m{4cm}|m{4cm}|}
+\hline
+\rowcolor{gray!20}
+\textbf{Critère} & \textbf{NeRF} & \textbf{3DGS} \\
+\hline
+Représentation & Implicite (réseau de neurones) & Explicite (gaussiennes 3D) \\
+\hline
+Vitesse de rendu & Lente (secondes/image) & Temps réel ($\sim$100 FPS) \\
+\hline
+Temps d'entraînement & Heures & Minutes \\
+\hline
+Édition de la scène & Difficile & Possible (accès direct aux primitives) \\
+\hline
+Qualité visuelle & Très bonne & Très bonne \\
+\hline
+\end{tabular}
+\caption{Comparaison entre NeRF et 3D Gaussian Splatting.}
+\label{tab:nerf_vs_3dgs}
+\end{table}
+
+\subsection{Asservissement Visuel}
+
+
+
+L'asservissement visuel (\textit{visual servoing}) peut être défini comme  l'ensemble des méthodes de commande qui, à partir des informations extraites d'une caméra comme signal de retour, permettent de guider un système vers une configuration désirée \cite{ref6}. 
+
+
+
+L'objectif de tous les schémas de commande basé sur la vision est de minimiser l'erreur $\mathbf{e}(t)$, définie par \cite{ref6} :
+
+\begin{equation}
+    \mathbf{e}(t) = \mathbf{s}(\mathbf{m}(t), \mathbf{a}) - \mathbf{s}^*
+    \label{eq:erreur_visuelle}
+\end{equation}
+
+où :
+\begin{itemize}[noitemsep, topsep=4pt]
+    \item $\mathbf{m}(t)$ est un ensemble de mesures image (coordonnées 
+    de points d'intérêt, centroïde d'un objet, etc.)
+    \item $\mathbf{s}(\mathbf{m}(t), \mathbf{a})$ est un vecteur de $k$ 
+    caractéristiques visuelles calculées à partir de ces mesures, où 
+    $\mathbf{a}$ représente une connaissance additionnelle du système 
+    (paramètres intrinsèques de la caméra, modèles 3D)
+    \item $\mathbf{s}^*$ contient les valeurs désirées de ces 
+    caractéristiques
+\end{itemize}
+
+\subsubsection{Matrice d'interaction}
+
+Le lien entre la variation temporelle des caractéristiques visuelles et 
+le mouvement de la caméra est donné par \cite{ref6} :
+
+\begin{equation}
+    \dot{\mathbf{s}} = \mathbf{L_s} \, \mathbf{v}_c
+    \label{eq:matrice_interaction}
+\end{equation}
+
+
+Cette formulation vient de :
+
+\begin{align}
+    \frac{\partial \mathbf{e}}{\partial t} 
+    &= \frac{\partial (\mathbf{s}(t) - \mathbf{s}^*)}{\partial t} \notag \\
+    &= \frac{\partial \mathbf{s}(t)}{\partial t} \quad (\text{car} \; \mathbf{s}^* \text{ est constant}) \notag \\
+    &= \frac{\partial \mathbf{s}(t)}{\partial \mathbf{r}} \cdot 
+    \frac{\partial \mathbf{r}}{\partial t} \notag \\
+    &= \mathbf{L_s} \, \mathbf{v}_c 
+\end{align}
+
+où $\mathbf{L_s} \in \mathbb{R}^{k \times 6}$ est la \textbf{matrice 
+d'interaction}  et 
+$\mathbf{v}_c = (\mathbf{v}_c, \boldsymbol{\omega}_c)$ est la vitesse  de la caméra, composée de sa vitesse linéaire $\mathbf{v}_c$ 
+et de sa vitesse angulaire $\boldsymbol{\omega}_c$.
+
+Ainsi on trouve finalement: 
+
+\begin{equation}
+    \dot{\mathbf{e}} = \mathbf{L_e} \, \mathbf{v}_c
+    \label{eq:16}
+\end{equation}
+
+où $\mathbf{L_e} = \mathbf{L_s}$. En choisissant $\mathbf{v}_c$ comme 
+entrée du contrôleur et en souhaitant une décroissance exponentielle de 
+l'erreur, c'est-à-dire :
+
+\begin{equation}
+    \mathbf{e}(t) = \mathbf{e}(0)\exp({-\lambda t}) \implies \dot{\mathbf{e}} = -\lambda \mathbf{e}
+    \label{eq:17}
+\end{equation}
+
+
+De \eqref{eq:16} et \eqref{eq:17}, obtient la loi de commande classique :
+
+\begin{equation}
+    \mathbf{v}_c = -\lambda \widehat{\mathbf{L}_e^+} \, \mathbf{e}
+    \label{eq:loi_commande}
+\end{equation}
+
+où $\widehat{\mathbf{L}_e^+}$ est une approximation de la pseudo-inverse 
+de $\mathbf{L_e}$ et $\lambda > 0$ est un gain de commande.
+
+\subsubsection{Approches IBVS et PBVS}
+
+Les schémas d'asservissement visuel varient en fonction du choix des caractéristiques $\mathbf{s}$ \cite{ref6} :
+
+\begin{itemize}[noitemsep, topsep=4pt]
+    \item \textbf{IBVS} (\textit{Image-Based Visual Servoing}) : le vecteur $\mathbf{s}$ est constitué de caractéristiques directement disponibles dans l'image — coordonnées de points, moments, contours. La commande est calculée entièrement dans l'espace image, sans passer par la reconstruction 3D explicite.
+    
+    \item \textbf{PBVS} (\textit{Position-Based Visual Servoing}) : le vecteur $\mathbf{s}$ est constitué de paramètres 3D estimés à partir des mesures image — position et orientation de la cible dans l'espace. La commande est calculée dans l'espace cartésien.
+\end{itemize}
+
+Pour un point image $(u, v)$ observé à la profondeur $Z$, la matrice 
+d'interaction associée est \cite{ref6} :
+
+\begin{equation}
+    \mathbf{L_p} = 
+    \begin{bmatrix}
+    -\frac{1}{Z} & 0 & \frac{u}{Z} & uv & -(1+u^2) & v \\
+    0 & -\frac{1}{Z} & \frac{v}{Z} & 1+v^2 & -uv & -u
+    \end{bmatrix}
+    \label{eq:Lp}
+\end{equation}
+
+\subsubsection{Limites de l'IBVS classique}
+
+L'IBVS classique repose sur la détection et le suivi de caractéristiques géométriques de l'image. Cette approche présente plusieurs limitations \cite{ref6, ref7} :
+
+\begin{itemize}[noitemsep, topsep=4pt]
+    \item \textbf{Dépendance aux features} : cette méthode est incompatible avec les environnements faiblement texturés.
+    \item \textbf{Perte de features} : si les points d'intérêt sortent 
+    du champ de vision, la commande devient invalide.
+    \item \textbf{Estimation de la profondeur} : le calcul de 
+    $\mathbf{L_s}$ nécessite la profondeur $Z$, difficile à estimer 
+    sans capteur dédié.
+    \item \textbf{Sensibilité à l'illumination} : les descripteurs 
+    géométriques sont sensibles aux variations de luminosité, ce qui peut entraîner des erreurs de détection .
+\end{itemize}
+
+Ces limitations ont motivé le développement de l'asservissement visuel 
+\textbf{photométrique} \cite{ref7}, qui s'affranchit entièrement de 
+l'extraction de features en exploitant directement l'intensité de tous 
+les pixels comme signal de commande.
+
+\subsection{Asservissement visuel photométrique}
+
+
+
+L'asservissement visuel photométrique (\textit{Photometric Visual Servoing}, PVS), introduit par Collewet et al. \cite{ref7}, propose une modification radical du processus du IBVS classique : au lieu d'extraire des caractéristiques géométriques de l'image, il utilise \textbf{directement la luminance de tous les pixels} comme signal de commande.
+
+\vspace{0.5cm}
+Les caractéristiques visuelles $\mathbf{s}$ sont ici l'ensemble des valeurs  de luminance $I(\mathbf{p})$ de tous les pixels $\mathbf{p}$ de l'image. 
+L'erreur photométrique est définie ainsi :
+
+\begin{equation}
+    \mathbf{e} = \mathbf{I}(\mathbf{p}, \mathbf{r}) - \mathbf{I}^*(\mathbf{p})
+    \label{eq:erreur_photo}
+\end{equation}
+
+où $\mathbf{I}(\mathbf{p}, \mathbf{r})$ est l'image courante, 
+$\mathbf{I}^*(\mathbf{p})$ est l'image cible et $\mathbf{r}$ est la 
+pose courante de la caméra. L'objectif est de minimiser la fonction de 
+coût suivante:
+
+\begin{equation}
+    \mathcal{C}(\mathbf{r}) = \frac{1}{2} \|\mathbf{I}(\mathbf{p}, \mathbf{r}) 
+    - \mathbf{I}^*(\mathbf{p})\|^2
+    \label{eq:cout_photo}
+\end{equation}
+
+\subsubsection{Matrice d'interaction photométrique}
+
+En appliquant le cadre général de l'asservissement visuel \eqref{eq:matrice_interaction}, 
+la relation entre la variation de la luminance et le mouvement de la caméra 
+est donnée par \cite{ref7} :
+
+\begin{equation}
+    \dot{\mathbf{I}} = \mathbf{L_I} \, \mathbf{v}_c
+    \label{eq:Li}
+\end{equation}
+
+où $\mathbf{L_I} \in \mathbb{R}^{n \times 6}$ est la matrice d'interaction 
+photométrique ($n$ étant le nombre de pixels) et $\mathbf{v}_c$ est le 
+torseur cinématique de la caméra. Pour un pixel $\mathbf{p} = (u, v)$, 
+la ligne correspondante de $\mathbf{L_I}$ s'écrit :
+
+\begin{equation}
+    \mathbf{L_I}(\mathbf{p}) = \nabla I \cdot \mathbf{L_p}
+    \label{eq:Li_pixel}
+\end{equation}
+
+où $\nabla I = \left(\frac{\partial I}{\partial u}, \frac{\partial I}{\partial v}\right)$ 
+est le gradient spatial de l'image et $\mathbf{L_p}$ est la matrice 
+d'interaction d'un point image \eqref{eq:Lp}. La loi de commande devient 
+alors :
+
+\begin{equation}
+    \mathbf{v}_c = -\lambda \mathbf{L_I^+} \, \mathbf{e}
+    \label{eq:commande_photo}
+\end{equation}
+
+\subsubsection{Asservissement comme problème d'optimisation}
+
+Dans l'article  \cite{ref7} l'asservissement photométrique est reformulé
+comme un \textbf{problème d'optimisation} — minimiser 
+$\mathcal{C}(\mathbf{r})$ \eqref{eq:cout_photo} — et proposent plusieurs stratégies de descente :
+
+\begin{itemize}[noitemsep, topsep=4pt]
+    \item \textbf{Descente de gradient} : simple mais lente à converger, sensible au choix du pas.
+    \item \textbf{Gauss-Newton} : plus rapide, approxime la hessienne 
+    par $\mathbf{L_I^\top L_I}$, valable au voisinage de la solution.
+    \item \textbf{Levenberg-Marquardt} : combine descente de gradient et Gauss-Newton, plus robuste et adaptatif.
+\end{itemize}
+
+\subsubsection{Avantages et limitations}
+
+L'asservissement photométrique présente plusieurs avantages majeurs par 
+rapport à l'IBVS classique \cite{ref7} :
+
+\begin{itemize}[noitemsep, topsep=4pt]
+    \item \textbf{Aucune extraction de features} : robuste aux environnements 
+    faiblement texturés ou peu structurés.
+    \item \textbf{Utilisation de toute l'information image} : exploite 
+    l'ensemble des pixels, pas seulement quelques points d'intérêt.
+    \item \textbf{Robustesse aux occultations partielles} : une occlusion 
+    partielle n'invalide pas la commande, contrairement à la perte d'un 
+    point de suivi.
+\end{itemize}
+
+Cependant, il souffre de limitations importantes :
+
+\begin{itemize}[noitemsep, topsep=4pt]
+    \item \textbf{Dimensionnalité élevée} : $\mathbf{e}$ est de taille 
+    $n$ (nombre de pixels), ce qui rend le calcul de $\mathbf{L_I^+}$ 
+    très coûteux.
+    \item \textbf{Bassin d'attraction limité} : la convergence n'est 
+    garantie que si la pose initiale est suffisamment proche de la pose 
+    désirée.
+    \item \textbf{Sensibilité à l'illumination} : la luminance brute est 
+    directement affectée par les changements de conditions lumineuses.
+\end{itemize}
+
+Ces limitations, notamment la dimensionnalité de l'espace image, motivent 
+le recours à une représentation en \textbf{espace latent} de faible 
+dimension, qui constitue l'axe central de ce travail.
+
+
+
+\subsection{Base de données : Mip-NeRF 360}
+
+Les champs de radiance neuronaux (\textit{Neural Radiance Fields}, NeRF) permettent de reconstruire des scènes 3D à partir d'un ensemble d'images 2D ou de vidéos prises sous différents angles. Cette approche a donné des résultats impressionnants pour la synthèse de nouvelles vues d'objets et de scènes de petite taille bornées, mais souffre lorsqu'il s'agit de traiter des scènes \textit{non limitées}, où la caméra peut être orientée dans n'importe quelle direction et où des éléments peuvent être présents à des distances très variables.
+
+
+\textbf{Mip-NeRF 360} \cite{ref8} est une extension de 
+Mip-NeRF — une variante de NeRF qui traite les problèmes d'échantillonnage et d'aliasing — spécifiquement conçue pour les scènes non bornées. Elle repose sur trois contributions principales : une paramétrisation non linéaire de la scène, une distillation en ligne, et un nouveau régularisateur basé sur la distorsion. Le modèle est nommé 
+\textit{mip-NeRF 360} car il cible des scènes où la caméra effectue 
+une rotation complète à 360°, réduit l'erreur quadratique moyenne de 
+57\% par rapport à Mip-NeRF, tout en permettant de générer des vues 
+synthétiques réalistes et des cartes de profondeur détaillées pour des 
+scènes réelles complexes.
+
+\subsubsection{Présentation du dataset}
+
+Le dataset Mip-NeRF 360 comprend plusieurs scènes capturées à 360° en environnements intérieurs et extérieurs, telle que : 
+
+\begin{itemize}
+    \item bicycle
+    \item bonsai
+    \item counter
+    \item garden
+    \item kitchen
+    \item room
+    \item stump
+\end{itemize}
+Chaque scène est accompagnée de :
+
+\begin{itemize}[noitemsep, topsep=4pt]
+    \item Des images haute résolution capturées depuis de nombreux points 
+    de vue autour d'un point central
+    \item Les poses de caméra reconstruites par \\COLMAP 
+    (fichiers \texttt{cameras.bin}, \texttt{images.bin}, 
+    \texttt{points3D.bin})
+    \item Un nuage de points 3D épars issu de la reconstruction SfM
+\end{itemize}
+
+\subsubsection*{Séquence \textit{room}}
+
+La séquence \textit{room} représente une pièce intérieure capturée depuis 
+une trajectoire orbitale à 360°. Ses caractéristiques principales sont :
+
+\begin{itemize}[noitemsep, topsep=3pt]
+    \item \textbf{311 images} capturées à haute résolution, disponibles 
+    sous plusieurs facteurs de sous-échantillonnage : résolution originale 
+    (\texttt{images/}), facteur 2 (\texttt{images\_2/}), facteur 4 
+    (\texttt{images\_4/}) et facteur 8 (\texttt{images\_8/})
+    \item \textbf{Poses COLMAP} couvrant un volume spatial d'environ 
+    $[-2.4,\ 2.9] \times [-2.4,\ 2.8] \times [-5.4,\ 4.0]$ m, 
+    stockées dans le fichier \texttt{poses\_bounds.npy}
+    \item Une scène \textbf{richement texturée} avec meubles, objets 
+    du quotidien et variations d'illumination, favorable à l'apprentissage 
+    de représentations visuelles robustes
+\end{itemize}
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/imagedata.png}
+    \caption{Exemple d'images du Dataset}
+    \label{fig:imgdata}
+\end{figure}
+
+
+
+\subsubsection*{Nerfstudio et Splatfacto}
+
+L'entraînement du modèle 3DGS est réalisé via \textbf{Nerfstudio} 
+\cite{ref9}, un framework open-source modulaire pour la 
+reconstruction de scènes neurales. Le modèle \textbf{Splatfacto} — 
+l'implémentation 3DGS de Nerfstudio — est entraîné sur 30 000 itérations 
+avec le pipeline COLMAP de la séquence \textit{room}, produisant un modèle 
+de reconstruction fidèle utilisé pour le rendu des vues de navigation.

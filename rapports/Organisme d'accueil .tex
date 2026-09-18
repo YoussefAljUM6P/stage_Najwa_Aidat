@@ -1,0 +1,42 @@
+\newpage
+\section{Ogranisme d'accueil}
+\subsection{AI Mouvement}
+
+ Ce stage a été réalisé au sein d'AI Movement, le Centre International Marocain de l'Intelligence Artificielle, créé  par la Pr. Amal El Fallah Seghrouchn au sein de l'Université Mohammed VI Polytechnique (UM6P). Ce centre a pour vocation d'accompagner les transformations induites par l'avènement de l'intelligence artificielle et des sciences des données, de promouvoir l'émergence d'un savoir-faire marocain et africain, et de répondre aux nombreux défis — scientifiques, technologiques et éthiques — soulevés par l'IA\cite{ref1}.
+
+Ses activités de recherche théorique et appliquée ont pour objectif  de développer des outils technologiques à fort impact et dignes de confiance, avec un haut niveau de maturité technologique (TRL), afin d'en faciliter le transfert vers l'industrie et ensuite vers la société. Le centre couvre ainsi plusieurs domaines d'application, parmi lesquels la santé, l'agriculture, l'éducation, le développement durable, la gestion des ressources, la finance et l'assurance, les politiques publiques, ou encore la défense, l'aéronautique et l'aérospatiale. 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{images/mission_aim.png}
+    \caption{Les sept piliers d'activité du centre AI Movement~\cite{ref1}.}
+    \label{fig:img1}
+\end{figure}
+
+Pour mener à bien ces travaux, AI Movement s'appuie sur des équipes de recherche pluridisciplinaires, composées d'ingénieurs, de doctorants et de stagiaires, travaillant en collaboration sur les différents axes de recherche du centre. Le centre bénéficie par ailleurs de nombreux atouts, notamment le data center de l'UM6P, le plus grand centre de données d'Afrique. 
+C'est notamment dans ce cadre que j'ai eu accès au supercalculateur \textbf{Toubkal}, l'infrastructure de calcul haute performance (HPC) de l'UM6P, sur laquelle j'ai réalisé l'ensemble des entraînements de mes modèles ainsi que les tâches de compilation et de calcul intensif nécessaires à ce stage.
+
+
+
+\subsection{Problématique du stage}
+
+L'asservissement visuel photométrique est une méthode utilisée pour guider un robot vers une pose désirée à partir d'images, sans extraction explicite des caractéristiques géométriques. Cette approche donne de meilleurs résultats en laboratoire, mais reste très sensible aux conditions d'illumination et nécessite une modélisation précise de l'environnement.
+
+Par ailleurs, les approches d'apprentissage par renforcement pour la navigation visuelle ont démontré leur efficacité dans des environnements 
+de simulation (AI2-THOR), mais souffrent d'un problème de transfert simulation-réalité (\textit{sim-to-real gap}) : un agent 
+entraîné dans un simulateur synthétique rencontre souvent des problèmes lors du passage à une scène réelle, en raison des différences visuelles entre les 
+deux domaines.
+
+Ce stage s'inscrit dans ce contexte et cherche trouver une réponse à la question suivante : \textbf{dans quelle mesure est-il possible de construire automatiquement un  environnement de simulation photoréaliste à partir de simples photos  d'une scène réelle, d'y entraîner un agent de navigation par 
+apprentissage par renforcement, et d'obtenir des résultats comparables à ceux de l'asservissement visuel photométrique ?}
+
+Le 3D Gaussian Splatting (3DGS) constitue un candidat naturel pour répondre à cette question : à partir d'un ensemble d'images capturées sous différents angles, il reconstruit automatiquement une représentation 
+3D photoréaliste de la scène, permettant de synthétiser de nouvelles vues depuis n'importe quelle pose. Le pipeline proposé suit donc les étapes suivantes :
+
+\begin{enumerate}[noitemsep, topsep=4pt]
+    \item Capture d'images de la scène réelle sous différents angles
+    \item Reconstruction de la scène via 3DGS
+    \item Entraînement d'un agent RL dans cet environnement synthétique
+    \item Navigation visuelle dans la scène réelle
+\end{enumerate}
+
+L'hypothèse centrale est que la fidélité visuelle du 3DGS réduit suffisamment le gap sim-to-real pour que les politiques apprises soient  directement transférables à la scène réelle, ouvrant ainsi la voie à une méthode de navigation visuelle flexible rapide et peu coûteuse, applicable à n'importe quelle scène dont on dispose de photos.

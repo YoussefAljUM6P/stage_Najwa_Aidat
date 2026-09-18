@@ -1,0 +1,110 @@
+\documentclass{rapportCS}
+
+% --- Packages additionnels (non présents dans la .cls) ---
+\usepackage{lipsum}
+\usepackage{amsmath}
+\usepackage{empheq}
+\usepackage{adjustbox}
+\usepackage[normalem]{ulem}
+\usepackage{rotating}
+\usepackage{enumitem}
+
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{multirow}
+
+\usepackage{amssymb}
+\usepackage[table]{xcolor}
+
+\usepackage{xstring}
+\usepackage{etoolbox}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, shadows}
+
+\makeatletter
+\patchcmd{\headrule}{\hrule}{\color{red}\hrule}{}{}
+\makeatother
+
+
+% Table de metière en bleu 
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue,
+    citecolor=blue
+}
+
+
+\begin{document}
+\usetikzlibrary{arrows.meta, positioning, calc}
+%----------- Informations du rapport ---------
+\logoentreprise{logos/logo-ai-mouvement-scaled.jpeg}
+\titre{Rapport de stage}
+\mention{Apprentissage par renforcement pour la navigation visuelle}
+\trigrammemention{DataSIM}
+\master{Option Données, analyse, traitement et applications en signal et image}
+
+\eleve{Najwa AIDAT}
+\dates{Avril 2026 -- Août 2026}
+
+\tuteurecole{
+    \textsc{Said MOUSSAOUI} \\
+    Said.Moussaoui@ec-nantes.fr \\
+    \textsc{Professeur des universités}
+}
+\tuteurentreprise{
+    \textsc{Youssef ALJ} \\
+    youssef.alj@um6p.ma
+    \textsc{Chercheur en vision par ordinateur}
+}
+
+% --- Génération page de garde, marges et table des matières ---
+\fairepagedegarde
+% -------------------------
+\input{remerciment}
+% -------------------------
+\input{résumé}
+% -------------------------
+\input{abstrat}
+% -------------------------
+\input{Glossaire}
+
+% -------------------------
+
+\fairemarges
+\newpage
+\tabledematieres
+
+\listoffigures
+\newpage
+
+\listoftables
+\newpage
+
+\input{Organisme d'accueil }
+
+
+
+
+
+%-----------------------
+\newpage
+\input{État d'art }
+%-----------------------
+
+
+\input{methodologie }
+%-----------------------
+
+\newpage
+\input{Perspectives }
+
+%-----------------------
+\newpage
+\bibliographystyle{unsrtnat} % ou unsrt, ieeetr, etc. selon le style demandé par l'école
+\bibliography{biblio}
+
+\newpage
+\input{annexes}
+
+\end{document}
